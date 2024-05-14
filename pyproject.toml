@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.isort]
+profile = "black"
+
+[project]
+name = "slurmtop"
+authors = [{name = "Léo Hunout", email = "leo.hunout@gmail.com"}]
+description = "A Slurm top"
+readme = "README.md"
+license = {file = "LICENSE"}
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: POSIX :: Linux",
+  "Operating System :: MacOS",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.7",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Topic :: Utilities",
+]
+dynamic = ["version"]
+requires-python = ">=3.7"
+dependencies = [
+   "rich >= 11.0.0",
+   "textual >= 0.58.0",
+]
+
+[tool.setuptools.dynamic]
+version = {attr = "slurmtop.__about__.__version__"}
+
+[project.urls]
+Code = "https://github.com/hunout/slurmtop"
+Issues = "https://github.com/hunout/slurmtop/issues"
+
+[project.scripts]
+slurmtop = "slurmtop._app:run"
