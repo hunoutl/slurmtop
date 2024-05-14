@@ -1,24 +1,28 @@
 import subprocess
+
 from rich import box
 from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
+from textual.app import App, ComposeResult
 from textual.widget import Widget
 from textual.widgets import DataTable
-from textual.app import App, ComposeResult
 
 
 def split_string_into_lines(string, max_length):
     lines = []
     for i in range(0, len(string), max_length):
-        lines.append(string[i:i+max_length])
-    return '\n'.join(lines)
+        lines.append(string[i : i + max_length])
+    return "\n".join(lines)
 
-def get_jobs_list(num_jobs: int = None, sort: str = None ):
+
+def get_jobs_list(num_jobs: int = None, sort: str = None):
     bashCommand = "squeue --sort P,t"
-    process = subprocess.run(bashCommand, shell=True, stdout=subprocess.PIPE, encoding='utf-8')
-    data=process.stdout.splitlines()
-    
+    process = subprocess.run(
+        bashCommand, shell=True, stdout=subprocess.PIPE, encoding="utf-8"
+    )
+    data = process.stdout.splitlines()
+
     headers = data[0].split()
     jobs = []
     for row in data[1:]:
@@ -26,17 +30,15 @@ def get_jobs_list(num_jobs: int = None, sort: str = None ):
         for header, value in zip(headers, row.split()):
             row_dict[header] = value
         jobs.append(row_dict)
-        
-    if num_jobs == None :
+
+    if num_jobs == None:
         return jobs
-    else :
+    else:
         return jobs[:num_jobs]
 
 
-
-
 class JobsList(Widget):
-    #BINDINGS = [("z", "sort", "Sort")]
+    # BINDINGS = [("z", "sort", "Sort")]
     DEFAULT_CSS = """
     JobsList {
         height: 100%;
@@ -55,49 +57,42 @@ class JobsList(Widget):
 
     def on_mount(self) -> None:
         jobs = get_jobs_list()
-        
+
         table = self.query_one(DataTable)
-        table.add_column("JOBID",width=8)
+        table.add_column("JOBID", width=8)
         table.add_column("PARTITION ▲")
         table.add_column("NAME")
         table.add_column("USER")
         table.add_column("S")
         table.add_column("TIME")
         table.add_column("NODES")
-        table.add_column("NODELIST",width=30)
+        table.add_column("NODELIST", width=30)
 
         for j in jobs:
             jobid = j.get("JOBID", "")
-            partition = j.get("PARTITION","")
-            name = j.get("NAME","")
-            user = j.get("USER","")
-            state = j.get("ST","")
-            time = j.get("TIME","")
-            nodes = j.get("NODES","")
-            
-            nodelist = j.get("NODELIST(REASON)","")
-   
+            partition = j.get("PARTITION", "")
+            name = j.get("NAME", "")
+            user = j.get("USER", "")
+            state = j.get("ST", "")
+            time = j.get("TIME", "")
+            nodes = j.get("NODES", "")
+
+            nodelist = j.get("NODELIST(REASON)", "")
+
             table.add_row(
-                jobid, partition, name, user, state, time, nodes, nodelist,height=None,
+                jobid,
+                partition,
+                name,
+                user,
+                state,
+                time,
+                nodes,
+                nodelist,
+                height=None,
             )
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-'''
+"""
 
 class JobsList_old(Widget):
 
@@ -159,4 +154,4 @@ class JobsList_old(Widget):
     def render(self) -> Panel:
         return self.panel
 
-'''
+"""

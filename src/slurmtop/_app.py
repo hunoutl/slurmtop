@@ -2,17 +2,15 @@ import argparse
 from sys import version_info
 
 from textual.app import App, ComposeResult
-from textual.widgets import Footer
-from textual.containers import Container, Grid
 from textual.binding import Binding
-from textual.widgets import Placeholder
-
-
+from textual.containers import Container, Grid
+from textual.widgets import Footer, Placeholder
 
 from .__about__ import __version__
 from ._info import InfoLine
 from ._sinfo import PartitionsList
 from ._squeue import JobsList
+
 
 def _get_version_text():
     python_version = f"{version_info.major}.{version_info.minor}.{version_info.micro}"
@@ -37,9 +35,7 @@ class SlurmtopApp(App):
         yield InfoLine()
         yield PartitionsList()
         yield JobsList()
-        yield Footer() 
-        
-
+        yield Footer()
 
 
 def run(argv=None):
@@ -58,6 +54,3 @@ def run(argv=None):
     args = parser.parse_args(argv)
     app = SlurmtopApp()
     app.run()
-
-
-

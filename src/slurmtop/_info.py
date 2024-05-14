@@ -1,14 +1,16 @@
 import getpass
+import os
 import platform
+import subprocess
 import time
 from datetime import datetime, timedelta
-import subprocess
-import os
+
 import distro
 import psutil
 from rich.table import Table
-from textual.widget import Widget
 from textual.geometry import Size
+from textual.widget import Widget
+
 
 class InfoLine(Widget):
     DEFAULT_CSS = """
@@ -36,24 +38,22 @@ class InfoLine(Widget):
             system_list = [ri["name"]]
             if "version_id" in ri:
                 system_list.append(ri["version_id"])
-            #system_list.append(f"{platform.architecture()[0]}/ {platform.release()}")
+            # system_list.append(f"{platform.architecture()[0]}/ {platform.release()}")
             system_string = " ".join(system_list)
         else:
             # fallback
             system_string = ""
-        
-        result = subprocess.run(['sinfo', '-V'], capture_output=True, text=True, check=True)
-        slurm_string = "/ Slurm "+result.stdout.split()[1]
+
+        result = subprocess.run(
+            ["sinfo", "-V"], capture_output=True, text=True, check=True
+        )
+        slurm_string = "/ Slurm " + result.stdout.split()[1]
         self.left_string = " ".join([ustring, system_string, slurm_string])
 
     def render(self):
-        table = Table(show_header=False, box=None,width=os.get_terminal_size()[0]-2)
+        table = Table(show_header=False, box=None, width=os.get_terminal_size()[0] - 2)
 
         table.add_column(justify="left")
         table.add_column(justify="right")
-        table.add_row(
-            self.left_string, datetime.now().strftime("%c")
-        )
+        table.add_row(self.left_string, datetime.now().strftime("%c"))
         return table
-
-
