@@ -25,7 +25,7 @@ Install Slurmtop via pip:
 pip install slurmtop
 ```
 
-For developpment:
+For development:
 ```bash
 pip install -e .
 
