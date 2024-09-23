@@ -1,6 +1,6 @@
 
 <p align="center">
-  <img src="/imgs/slurmtop_logo.jpeg" alt="Slurmtop Logo" />
+  <img src="https://raw.githubusercontent.com/hunoutl/slurmtop/fe90324367067f962ffebf0666dbaf7f5b4ad86d/imgs/slurmtop_logo.jpeg" width=640px alt="Slurmtop Logo" />
 </p>
 
 <p align="center">
@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <img src="/imgs/slurmtop_preview.png" alt="Slurmtop Preview" title="Slurmtop Preview" />
+  <img src="https://raw.githubusercontent.com/hunoutl/slurmtop/fe90324367067f962ffebf0666dbaf7f5b4ad86d/imgs/slurmtop_preview.png" alt="Slurmtop Preview" title="Slurmtop Preview" />
 </p>
 
 
