@@ -10,3 +10,9 @@ repos:
       - id: black
         language_version: python3
 
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: v0.0.287
+    hooks:
+      - id: ruff
+        args: [--target-version=py312, --select=E4,E7,E9,F,I]
+

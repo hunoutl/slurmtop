@@ -6,7 +6,6 @@ import time
 from asyncio import sleep
 from datetime import datetime, timedelta
 
-import psutil
 from rich.table import Table
 from textual import work
 from textual.app import ComposeResult
