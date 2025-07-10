@@ -1,0 +1,41 @@
+Screen {
+    color: white;
+    layout: grid;
+    grid-size: 1 3; 
+    grid-rows: auto 2fr 4fr;
+}
+
+
+InfoLine {
+    height: 1fr;
+    border: round #33ffbe;
+    }
+   
+
+PartitionsUtilizationViewer {
+    width: 100%;
+    border: round;
+    scrollbar-gutter: auto;
+}
+
+SqueueViewer {
+    height: 100%;
+    width: 100%;
+    border: round #33ffbe;
+}
+DataTable {
+    scrollbar-size: 1 1;
+    scrollbar-background: black 0%;
+    background: black 0%;
+}
+
+
+VerticalScroll {
+    scrollbar-size: 1 1;
+    scrollbar-background: rgb(43, 166, 152) 0%;
+}
+
+LoadingIndicator {
+    background: black 0%;
+    color: greenyellow;
+}

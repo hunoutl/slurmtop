@@ -9,26 +9,17 @@ from textual import work
 from textual.app import App, ComposeResult
 from textual.events import Click
 from textual.widget import Widget
-from textual.widgets import DataTable, Label
+from textual.widgets import DataTable, Input, Label, Static
 
-from ._data import SlurmData, SqueueData
+from slurmtop.data import SlurmData
 
 
 class SqueueViewer(Widget):
     """Viewer Widget for SQUEUE, generate a datatable for all jobs running on slurm"""
 
     BORDER_TITLE = "SQUEUE"
-    DEFAULT_CSS = """
-    SqueueViewer {
-        height: 100%;
-        width: 100%;
-        border: round #33ffbe;
-    }
-    DataTable {
-        scrollbar-size: 1 1;
-        scrollbar-background: black 0%;
-    }
-    """
+
+    BINDINGS = []
 
     def __init__(self, slurm: SlurmData):
         super().__init__()
@@ -39,22 +30,25 @@ class SqueueViewer(Widget):
             None  # Track the current order (True for ascending, False for descending)
         )
         self.loading = True  # Flag to indicate loading state
+        self.filter_text = ""  # Store the current filter string
+        self.filter_column = None  # Store the column to filter on (optional)
+        self.showing_filter_input = False  # Track if filter input is shown
 
     def compose(self) -> ComposeResult:
         yield DataTable(cursor_type="row")
 
     def on_mount(self) -> None:
         """Start loading data when the widget is mounted."""
+        self.loading = True
         # self.set_interval(5.0, self.refresh_viewer)
-        self.refresh_viewer(refresh_data=True)  # Trigger the async data loading task
+        self.refresh_viewer()  # Trigger the async data loading task
 
     @work  # Make sure this runs asynchronously
-    async def refresh_viewer(self, refresh_data: bool = False) -> None:
-        """Simulate loading data asynchronously."""
-        data_table = self.query_one(DataTable)
+    async def refresh_viewer(self) -> None:
 
-        if refresh_data:
-            self.squeue.refresh()
+        data_table = self.query_one(DataTable)
+        self.squeue.refresh()
+
         jobs = self.squeue.jobs  # Fetch jobs using SqueueData
 
         data_table.clear(columns=True)  # Clear existing columns and data
@@ -75,7 +69,10 @@ class SqueueViewer(Widget):
 
     def format_value(self, job: dict, key: str) -> str:
         """Format the value based on the key."""
-        return job.get(key, "N/A")
+        value = str(job.get(key, "N/A"))
+        if len(value) >= 12 and key != "time_elapse":
+            value = value[:10] + ".."
+        return value
 
     def sort_reverse(self, column: str) -> bool:
         """Toggle and return the reverse sorting order for the specified column."""
@@ -134,30 +131,23 @@ class SqueueMetricsViewer(Widget):
     """SQUEUE Overview vizualisation widget, display queue metrics"""
 
     BORDER_TITLE = "SQUEUE-METRICS"
-    DEFAULT_CSS = """
-    SqueueMetricsViewer {
-        height: 100%;
-        width: 40%;
-        border: round #33ffbe;
-    }
-    """
 
     def __init__(self, slurm: SlurmData = None):
         super().__init__()
         self.slurm = slurm
-        self.loading = True  # Flag to indicate loading state
 
     def compose(self) -> ComposeResult:
         yield Label()
 
     def on_mount(self) -> None:
         """Start loading data when the widget is mounted."""
+        self.loading = True
         self.load_data()  # Trigger the async data loading task
 
     @work  # Make sure this runs asynchronously
     async def load_data(self) -> None:
-        """Simulate loading data asynchronously."""
-        await sleep(1)  # Simulate data fetching or processing delay
+        await sleep(1)
+
         jobs = self.slurm.squeue_data.jobs
 
         metrics_table = Table(
@@ -180,7 +170,7 @@ class SqueueMetricsViewer(Widget):
 
         label = self.query_one(Label)
         label.update(metrics_table)
-        self.loading = False  # Data has been loaded, stop loading indicator
+        self.loading = False
 
 
 def datetime_to_seconds(time_str: str) -> int:

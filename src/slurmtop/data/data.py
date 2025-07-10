@@ -3,11 +3,14 @@ import os
 import subprocess
 import time
 from datetime import datetime
+from sys import version_info
 from typing import Dict, List
 
 from rich import box
 from rich.table import Table
 from rich.text import Text
+
+__version__ = "0.0.4"
 
 
 class SlurmData:
@@ -24,7 +27,6 @@ class SinfoData:
     def __init__(self):
         self.data_raw = []
         self.data = []
-        self.refresh_data()  # refresh data_raw & data
 
     def fetch_data(self) -> List[str]:
         """Fetch the raw data directly from sinfo cmd"""
@@ -74,8 +76,8 @@ class SqueueData:
             "priority_number",
         ]
         # Load initial job data
+        self.jobs_raw = []
         self.jobs = []
-        self.refresh()
 
     def fetch_squeue_data(self) -> List[Dict]:
         """Fetches the raw job list using the squeue command."""
@@ -113,13 +115,7 @@ class SqueueData:
 
             job["time_elapse"] = time_elapse
 
-            processed_job = {
-                key: (str(job.get(key))[:17] + "...")
-                if len(str(job.get(key))) > 20
-                else str(job.get(key, ""))
-                for key in self.keys
-            }
-            processed_jobs.append(processed_job)
+            processed_jobs.append(job)
 
         return processed_jobs if max_jobs is None else processed_jobs[:max_jobs]
 
@@ -151,3 +147,13 @@ def time_to_seconds(time_str: str) -> int:
     except ValueError:
         # In case of an invalid time format, return 0 as fallback
         return 0
+
+
+def get_version_text():
+    python_version = f"{version_info.major}.{version_info.minor}.{version_info.micro}"
+    return "\n".join(
+        [
+            f"slurmtop {__version__} [Python {python_version}]",
+            "Copyright (c) 2024-2025 Léo Hunout (IDRIS/CNRS)",
+        ]
+    )

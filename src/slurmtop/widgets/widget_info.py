@@ -37,31 +37,22 @@ def get_os_release_info():
 
 
 class InfoLine(Widget):
-    DEFAULT_CSS = """
-    InfoLine {
-        height: 1fr;
-        border: round #33ffbe;
-        }
-    
-    """
     BORDER_TITLE = "SLURMTOP"
 
     def __init__(self):
         super().__init__()
-        self.loading = True
 
     def compose(self) -> ComposeResult:
         yield Label()
 
     def on_mount(self) -> None:
         """Start loading data when the widget is mounted."""
-        self.set_interval(1.0, self.refresh_viewer)
+        self.loading = True
         self.refresh_viewer()  # Trigger the async data loading task
 
     @work  # Make sure this runs asynchronously
     async def refresh_viewer(self) -> None:
         """Simulate loading data asynchronously."""
-        # await sleep(1)  # Simulate data fetching or processing delay
 
         line = self.query_one(Label)
 

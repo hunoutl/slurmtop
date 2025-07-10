@@ -9,59 +9,48 @@ from textual import work
 from textual.app import ComposeResult
 from textual.containers import VerticalScroll
 from textual.widget import Widget
-from textual.widgets import Label
+from textual.widgets import DataTable
 
-from ._data import SlurmData
+from slurmtop.data import SlurmData
 
 
 class PartitionsUtilizationViewer(Widget):
 
-    DEFAULT_CSS = """
-    PartitionsUtilizationViewer {
-        width: 60%;
-        border: round;
-    }
-    VerticalScroll {
-        scrollbar-size: 1 1;
-        scrollbar-background: black 0%;
-    }
-    """
+    CSS_PATH = "styles/base.css"
     BORDER_TITLE = "SINFO"
 
     def __init__(self, slurm: SlurmData):
         super().__init__()
         self.sinfo = slurm.sinfo_data
-        self.squeue = slurm.squeue_data
-        self.loading = True  # Flag to indicate loading state
 
     def compose(self) -> ComposeResult:
-        yield VerticalScroll(Label())
+        yield DataTable(
+            cursor_type="none",
+        )
 
     def on_mount(self):
-        self.set_interval(5.0, self.refresh_viewer)
+        self.loading = True
         self.refresh_viewer()
 
     @work  # Make sure this runs asynchronously
     async def refresh_viewer(self):
         self.sinfo.refresh_data()
-        partition_table = Table(
-            show_header=True,
-            header_style="bold",
-            box=None,
-            padding=(0, 1),
-            expand=True,
-        )
 
-        bar_width = 25
+        partition_table = self.query_one(DataTable)
 
-        partition_table.add_column(
-            "Partition", justify="left", style="cyan", no_wrap=True
-        )
+        terminal_width = os.get_terminal_size().columns
+        viewer_width = terminal_width - 3
+        if viewer_width < 62:
+            viewer_width = 62
+
+        bar_width = viewer_width - 50
+
+        partition_table.add_column("Partition")
         partition_table.add_column("Load")
-        partition_table.add_column("[notbold][red]Alloc", justify="right", no_wrap=True)
-        partition_table.add_column("[green]Idle", justify="right", no_wrap=True)
-        partition_table.add_column("[orange1]Other", justify="right", no_wrap=True)
-        partition_table.add_column("Total", justify="right", no_wrap=True)
+        partition_table.add_column("[notbold][red]Alloc")
+        partition_table.add_column("[green]Idle")
+        partition_table.add_column("[orange1]Other")
+        partition_table.add_column("Total")
 
         partitions = self.sinfo.data
         for partition in partitions:
@@ -80,10 +69,12 @@ class PartitionsUtilizationViewer(Widget):
                 + f"""{p_ratio_usage}%""".rjust(6)
                 + "[white]]"
             )
+
+            if len(p_name) > 12:
+                p_name = p_name[:10] + ".."
+
             partition_table.add_row(
                 p_name, p_bar, str(p_alloc), str(p_idle), str(p_other), str(p_total)
             )
 
-        text = self.query_one(Label)
-        text.update(partition_table)
-        self.loading = False  # Flag to indicate loading state
+        self.loading = False

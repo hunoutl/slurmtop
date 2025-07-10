@@ -27,8 +27,8 @@ classifiers = [
 dynamic = ["version"]
 requires-python = ">=3.7"
 dependencies = [
-   "rich >= 13.8.0",
-   "textual >= 0.79.1",
+   "rich >= 14.0.0",
+   "textual >= 3.5.0",
 ]
 
 [tool.setuptools.dynamic]
